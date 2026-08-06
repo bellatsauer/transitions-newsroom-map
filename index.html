@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, intial-scale-1.0">
+    <title>Transitions Newsroom Map</title>
+
+    <!-- Leaflet CSS-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css"/>
+
+    <!-- Leaflet JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+
+    <!-- Marker Cluster CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.css"/>
+
+    <!-- Marker Cluster JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.js"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
+    <style> 
+    body { margin: 0; font-family: Arial, sans-serif; }
+
+    #map { width: 100%; height: 100vh; }
+
+    /* sidebar (hidden) */
+    #sidebar {
+        position: fixed;
+        top: 0;
+        left: -350px;
+        width: 350px;
+        height: 100%;
+        background: white;
+        box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
+        transition: right 0.3s ease;
+        box-sizing: border-box;
+        overflow-y: auto;
+        z-index: 1000;
+    }
+
+    /* sidebar (visible)*/
+    #sidebar.open {
+        left: 0;
+    }
+
+    #sidebar-logo {
+        width: 100%; 
+        height: 140px; 
+        object-fit: contain;
+        border-radius: 8px;
+        display: block;
+        background: white;
+        margin-top: 16px;
+        margin-bottom: 16px;
+    }
+
+    /*#sidebar-name {
+        font-size: 25px;
+        font-weight: bold;
+        margin: 0 0 8px;
+        text-align: center;
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+    */
+    #sidebar-bio {
+        font-size: 14px;
+        color: #555;
+        line-height: 1.6;
+        text-align: left;
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    #close-btn {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        background: none;
+        border: none;
+        font-size: 20px; 
+        cursor: pointer; 
+        color: #555;
+    }
+
+    #newsroom-dropdown {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 1000;
+        font-family: Arial, sans-serif;
+    }
+
+    #dropdown-btn {
+        background: white;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 16px;
+        margin-left: 40px;
+        font-size: 13px;
+        font-weight: bold;
+        color: #333;
+        cursor: pointer;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        white-space: nowrap;
+    }
+
+    #dropdown-list {
+        display: none;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        margin-top: 6px;
+        margin-left: 40px;
+        padding: 12px;
+        max-height: 400px;
+        overflow-y: auto;
+        width: 260px;
+    }
+
+    .country-group h4 {
+        margin: 10px 0 4px;
+        font-size: 13px;
+        color: #5AB4B5;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 4px;
+    }
+
+    .country-group:first-child h4 {
+        margin-top: 0;
+    }
+
+    .country-group ul {
+        margin: 0;
+        padding-left: 16px;
+    }
+
+    .country-group ul li {
+        font-size: 12px;
+        color: #555;
+        padding: 2px 0;
+    }
+    /*.newsroom-label {
+        background: white;
+        border: none;
+        box-shadow: none;
+        font-size: 12px;
+        font-weight: bold;
+        color: #000;
+        padding: 3px 8px;
+        white-space: nowrap;
+    }
+
+    .newsroom-label::before {
+        display: none;
+    } */
+
+    /*.newsroom-label {
+        background: red !important;
+        color: white !important;
+        font-size: 14px !important;
+        padding: 4px 8px !important;
+    }*/
+    </style>
+</head>
+
+<body>
+
+    <div id="map"></div>
+
+    <div id="newsroom-dropdown">
+        <button id="dropdown-btn">41 newsrooms supported across 21 countries ▾</button>
+        <div id="dropdown-list">
+
+            <div class="country-group">
+                <h4>Albania</h4>
+                <ul>
+                    <li>Albanian Center for Quality Journalism (ACQJ)</li>
+                    <li>Pozitivi.org</li>
+                </ul>
+            </div>
+
+            <div class="country-group">
+                <h4>Austria</h4>
+                <ul>
+                    <li>Relevant News</li>
+                </ul>
+            </div>
+
+            <div class="country-group">
+                <h4>Bosnia and Herzegovina</h4>
+                <ul>
+                    <li>eTrafika</li>
+                    <li>Capital</li>
+                </ul>
+            </div>
+
+            <div class="country-group">
+                <h4>Croatia</h4>
+                <ul>
+                    <li>Lika Club</li>
+                </ul>
+            </div>
+
+            <div class="country-group">
+                <h4>Czech Republic</h4>
+                <ul>
+                    <li>Reporter</li>
+                    <li>Okraj</li>
+                    <li>Heroine</li>
+                    <li>Page Not Found</li>
+                    <li>Romea</li>
+                    <li>Respekt</li>
+                    <li>Ekonews</li>
+                </ul>
+            </div>
+
+            <div class="country-group">
+                <h4>Germany</h4>
+                <ul>
+                    <li>Zeitenspiegel Reportagen</li>
+                </ul>
+            </div>
+
+            <div class="country-group">
+                <h4>Hungary</h4>
+                <ul>
+                    <li>Telex</li>
+                    <li>Nyugat</li>
+                    <li>KecsUP</li>
+                    <li>Debreciner</li>
+                    <li>ALAP</li>
+                </ul>
+            </div>
+
+            <div class="country-group">
+                <h4>Italy</h4>
+                <ul>
+                    <li>RADAR Magazine</li>
+                    <li>Slow News</li>
+                    <li>lavialibera</li>
+                </ul>
+            </div>
+
+            <div class="country-group">
+                <h4>Kosovo</h4>
+                <ul>
+                    <li>Radio Goraždevac</li>
+                </ul>
+            </div>
+
+            <div class="country-group">
+                <h4>Lithuania</h4>
+                <ul>
+                    <li>LRT</li>
+                    <li>Radio FM99</li>
+                </ul>
+            </div>
+
+            <div class="country-group">
+                <h4>Moldova</h4>
+                <ul>
+                    <li>Moldova.org</li>
+                </ul>
+            </div>
+
+            <div class="country-group">
+                <h4>Montenegro</h4>
+                <ul>
+                    <li>MINA</li>
+                </ul>
+            </div>
+
+            <div class="country-group">
+                <h4>Netherlands</h4>
+                <ul>
+                    <li>Vers Beton</li>
+                    <li>MOMUS</li>
+                </ul>
+            </div>
+
+            <div class="country-group">
+                <h4>Poland</h4>
+                <ul>
+                    <li>Sestry</li>
+                </ul>
+            </div>
+
+            <div class="country-group">
+                <h4>Portugal</h4>
+                <ul>
+                    <li>Mensagem de Lisboa</li>
+                </ul>
+            </div>
+
+            <div class="country-group">
+                <h4>Romania</h4>
+                <ul>
+                    <li>HotNews/Panorama</li>
+                    <li>Scena9</li>
+                    <li>Átlátszó Erdély</li>
+                </ul>
+            </div>
+
+            <div class="country-group">
+                <h4>Serbia</h4>
+                <ul>
+                    <li>Storyteller</li>
+                </ul>
+            </div>
+
+            <div class="country-group">
+                <h4>Slovakia</h4>
+                <ul>
+                    <li>Denník N</li>
+                </ul>
+            </div>
+
+            <div class="country-group">
+                <h4>Slovenia</h4>
+                <ul>
+                    <li>Ovtar24.si</li>
+                </ul>
+            </div>
+
+            <div class="country-group">
+                <h4>Spain</h4>
+                <ul>
+                    <li>Maldita.es</li>
+                    <li>RUIDO Photo</li>
+                </ul>
+            </div>
+
+            <div class="country-group">
+                <h4>Ukraine</h4>
+                <ul>
+                    <li>Rubryka</li>
+                    <li>Ukrainian House/Voice of Crimea</li>
+                </ul>
+            </div>
+
+  </div>
+</div>
+    <!-- sidebar appears when clicked -->
+    <div id="sidebar">
+        <button id="close-btn">✕</button>
+        <img id="sidebar-logo" src="" alt=""/>
+        <p id="sidebar-bio"></p>
+    </div>
+
+    <script>
+        
+        //initialize map
+        var map = L.map('map').setView([50, 15], 5); 
+        var markerCluster = L.markerClusterGroup({
+            maxClusterRadius: 30,
+            iconCreateFunction: function(cluster) {
+                return L.divIcon({
+                html: '<div style="background:#7F1334; color:white; border-radius:50%; width:40px; height:40px; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:14px;">' + cluster.getChildCount() + '</div>',
+                iconSize: [40, 40],
+                className: ''
+            });
+        }
+    });
+
+        //bg tiles
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
+
+        // countries with newsrooms
+        var newsroomCountries = [
+        "Czech Republic", "Bosnia and Herzegovina", "Lithuania", "Ukraine",
+        "Slovakia", "Hungary", "Moldova", "Serbia", "Romania", "Kosovo",
+        "Poland", "Austria", "Spain", "Italy", "Netherlands", "Portugal",
+        "Montenegro", "Albania", "Germany", "Croatia", "Slovenia"
+        ];
+
+        //country boundaries
+        fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson')
+        .then(function(response) { return response.json(); })
+        .then(function(data) {
+            L.geoJson(data, {
+            style: function(feature) {
+                var name = feature.properties.ADMIN || feature.properties.name;
+                if (newsroomCountries.indexOf(name) !== -1) {
+                return { fillColor: '#5AB4B5', fillOpacity: 0.3, color: '#5AB4B5', weight: 1 };
+                }
+                return { fillColor: 'transparent', fillOpacity: 0, color: 'transparent', weight: 0 };
+            }
+            }).addTo(map);
+        });
+        //close sidebar when X is clicked
+        document.getElementById('close-btn').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.remove('open');
+        });
+
+        // dropdown toggle
+        document.getElementById('dropdown-btn').addEventListener('click', function() {
+        var list = document.getElementById('dropdown-list');
+        list.style.display = list.style.display === 'block' ? 'none' : 'block';
+        });
+
+        //logo circle marker 
+        function createLogoMarker(lat, lng, iconFile, logoFile, name, bio) {
+
+            //custom icon for each logo img
+            var icon = L.divIcon({
+                html: '<img src="' + iconFile + '" style="width:40px; height:40px; border-radius:50%; object-fit:contain; border: 3px solid #c0c0c0; background:white; "/>', 
+                iconSize: [40, 40], 
+                iconAnchor: [20, 20], 
+                className: ''
+            });
+
+            //Puts marker on map 
+            L.marker([lat, lng], {icon: icon})
+                L.marker([lat, lng], {icon: icon})
+                .addTo(markerCluster)
+                /*.bindTooltip(name, {
+                    permanent: true,
+                    direction: 'right',
+                    className: 'newsroom-label'
+                })*/
+                .on('click', function () {
+                    //sidebar shows newsroom bio 
+                    document.getElementById('sidebar-logo').src = logoFile;
+                    document.getElementById('sidebar-bio').innerHTML = bio;
+                    //opens side bar 
+                    document.getElementById('sidebar').classList.add('open'); 
+                });
+        }
+
+        var SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRfFwSeKuUn49O0NUu-mxL6r0OhQiu4PexadO7LEt7BNjCh8TMLikx0VTNzangq7XD8z4mFCi34fZ4R/pub?output=csv';
+
+        Papa.parse(SHEET_URL, {
+        download: true,
+        header: true,
+        complete: function(results) {
+            results.data.forEach(function(row) {
+            if (!row.lat || !row.lng) return;
+            createLogoMarker(
+                parseFloat(row.lat),
+                parseFloat(row.lng),
+                row.icon,
+                row.logo,
+                row.name,
+                row.bio
+            );
+            });
+        }
+        });
+
+        map.addLayer(markerCluster);
+    </script>
+
+</body>
+</html>
