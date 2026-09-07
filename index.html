@@ -171,7 +171,7 @@
     <div id="map"></div>
 
     <div id="newsroom-dropdown">
-        <button id="dropdown-btn">41 newsrooms supported across 21 countries ▾</button>
+        <button id="dropdown-btn">44 newsrooms supported across 21 countries ▾</button>
         <div id="dropdown-list">
 
             <div class="country-group">
@@ -179,13 +179,14 @@
                 <ul>
                     <li>Albanian Center for Quality Journalism (ACQJ)</li>
                     <li>Pozitivi.org</li>
+                    <li>Gogo.al</li>
                 </ul>
             </div>
 
             <div class="country-group">
                 <h4>Austria</h4>
                 <ul>
-                    <li>Relevant News</li>
+                   <li>Relevant News</li>
                 </ul>
             </div>
 
@@ -232,6 +233,7 @@
                     <li>KecsUP</li>
                     <li>Debreciner</li>
                     <li>ALAP</li>
+                    <li>Magyar Hang</li>
                 </ul>
             </div>
 
@@ -248,6 +250,7 @@
                 <h4>Kosovo</h4>
                 <ul>
                     <li>Radio Goraždevac</li>
+                    <li>Kosovo 2.0</li>
                 </ul>
             </div>
 
@@ -341,6 +344,8 @@
                 </ul>
             </div>
 
+        </div>
+
   </div>
 </div>
     <!-- sidebar appears when clicked -->
@@ -366,12 +371,14 @@
     });
 
         //bg tiles
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
-
+        L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>',
+            maxZoom: 20
+        }).addTo(map);
         // countries with newsrooms
         var newsroomCountries = [
-        "Czech Republic", "Bosnia and Herzegovina", "Lithuania", "Ukraine",
-        "Slovakia", "Hungary", "Moldova", "Serbia", "Romania", "Kosovo",
+        "Czech Republic", "Czechia", "Bosnia and Herzegovina", "Lithuania", "Ukraine",
+        "Slovakia", "Hungary", "Moldova", "Serbia", "Republic of Serbia", "Romania", "Kosovo",
         "Poland", "Austria", "Spain", "Italy", "Netherlands", "Portugal",
         "Montenegro", "Albania", "Germany", "Croatia", "Slovenia"
         ];
