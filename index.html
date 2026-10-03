@@ -420,7 +420,6 @@
             });
 
             //Puts marker on map 
-            L.marker([lat, lng], {icon: icon})
                 L.marker([lat, lng], {icon: icon})
                 .addTo(markerCluster)
                 /*.bindTooltip(name, {
@@ -433,8 +432,8 @@
                     var logo = document.getElementById('sidebar-logo');
                     logo.src = logoFile;
                     logo.style.padding = '0px';
-                    logo.style.width = row.logoWidth || '100%';
-                    logo.style.height = row.logoHeight || '140px';
+                    logo.style.width = logoWidth || '100%';
+                    logo.style.height = logoHeight || '140px';
                     logo.style.margin = '0 auto';
                     logo.style.display = 'block';   
                     document.getElementById('sidebar-bio').innerHTML = bio;
