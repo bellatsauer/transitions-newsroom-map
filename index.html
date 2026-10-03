@@ -409,7 +409,7 @@
         });
 
         //logo circle marker 
-        function createLogoMarker(lat, lng, iconFile, logoFile, name, bio) {
+        function createLogoMarker(lat, lng, iconFile, logoFile, name, bio, logoPadding) {
 
             //custom icon for each logo img
             var icon = L.divIcon({
@@ -431,6 +431,7 @@
                 .on('click', function () {
                     //sidebar shows newsroom bio 
                     document.getElementById('sidebar-logo').src = logoFile;
+                    document.getElementById('sidebar-logo').style.padding = logoPadding || '0px';
                     document.getElementById('sidebar-bio').innerHTML = bio;
                     //opens side bar 
                     document.getElementById('sidebar').classList.add('open'); 
@@ -451,7 +452,8 @@
                 row.icon,
                 row.logo,
                 row.name,
-                row.bio
+                row.bio, 
+                row.logoPadding
             );
             });
         }
